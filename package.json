@@ -4,27 +4,67 @@
   "description": "An aUTOmated inDEX",
   "main": "index.js",
   "scripts": {
-    "build": "npm run clean && tsc -b ./src && npm run copy-files",
-    "copy-files": "cp -r ./src/public/ ./dist/",
+    "build": "concurrently --prefix \"[{name}]\" --names \"CLIENT,SERVER,ETL\" -c \"bgBlue.bold,bgGreen.bold,bgRed.bold\" \"npm run build:client\" \"npm run build:server\" \"npm run build:etl\"",
+    "build:etl": "tsc -b ./etl",
+    "build:server": "tsc -b ./server",
+    "copy": "npm run-all copy:client copy:server",
+    "copy:client": "npm-run-all copy:client:favicon copy:client:views",
+    "copy:client:favicon": "cp ./shared/assets/favicon.ico ./dist/client/favicon.ico",
+    "copy:client:views": "cp -r ./client/views ./dist/client/views",
+    "copy:server": "cp ./shared/assets/favicon.ico ./dist/server/favicon.ico",
     "clean": "rm -rf ./dist",
-    "etl": "tsc-watch --noClear -b ./src --onSuccess \"node dist/etl.js\"",
-    "server": "tsc-watch --noClear -b ./src --onSuccess \"node dist/server.js\"",
-    "client": "tsc-watch --noClear -b ./src --onSuccess \"node dist/client.js\"",
+
+    "build-client": "npm-run-all clean:client build:client copy:client",
+    "build-server": "npm-run-all clean:server build:server copy:server",
+
+    "build:client": "tsc -b ./client",
+    "build:server": "tsc -b ./server",
+
+    "clean:client": "rm -rf ./dist/client",
+    "clean:server": "rm -rf ./dist/server",
+
+    "lint:client": "eslint client --ext .ts",
+    "lint:server": "eslint server --ext .ts",
+
+    "serve": "concurrently --prefix \"[{name}]\" --names \"CLIENT,SERVER\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run serve:client\" \"npm run serve:server\"",
+
+
+    "serve:client": "nodemon --watch client -e ts,ejs --exec npm run serve:client:start",
+    "serve:client:start": "npm-run-all build-client start:client",
+    "start:client": "node dist/client/main.js",
+
+    "serve:server": "nodemon --watch server -e ts,ejs --exec npm run serve:server:start",
+    "serve:server:start": "npm-run-all build-server start:server",
+    "start:server": "node dist/server/main.js",
+
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@fast-csv/parse": "^4.3.6",
+    "axios": "^0.27.2",
     "cors": "^2.8.5",
+    "ejs": "^3.1.7",
     "express": "^4.17.3",
     "pg": "^8.7.3",
+    "serve-favicon": "^2.5.0",
     "tslib": "^2.4.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",
     "@types/node": "^17.0.25",
+    "@typescript-eslint/eslint-plugin": "^5.22.0",
+    "@typescript-eslint/parser": "^5.22.0",
+    "concurrently": "^7.1.0",
+    "ejs-lint": "^0.1.1",
+    "eslint": "^8.14.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-ejs": "^0.0.2",
+    "eslint-plugin-import": "^2.26.0",
+    "nodemon": "^2.0.16",
+    "npm-run-all": "^4.1.5",
     "tsc-watch": "^5.0.3",
-    "typescript": "^4.6.3"
+    "typescript": "^4.6.4"
   }
 }

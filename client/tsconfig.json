@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "../dist/client",
+    "composite": true
+  },
+  "include": ["**/*.ts", "**/*.ejs"],
+  "exclude": ["**/*.test.ts"]
+}
