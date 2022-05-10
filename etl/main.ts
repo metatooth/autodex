@@ -1,12 +1,12 @@
 import fs from 'fs';
 import { parse } from '@fast-csv/parse';
 import { Contact } from '../shared/types';
-import { query } from '../shared/db';
+import { query } from '../shared/db.js';
 
-async function handleFive(entry) {
+async function handleFive(entry: Array<string>) {
   const addy = entry[1].split(',');
   if (addy.length === 2) {
-    query<Contact>('INSERT INTO contacts (organization, city, statecode, contact, email, phone1, location) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id', [entry[0], addy[0], addy[1].trim(), entry[2], entry[3], entry[4], entry[1]])
+    query<Contact>('INSERT INTO contacts (organization, city, statecode, contact, email, phone1, location) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id', [entry[0], addy[0], addy[1].trim(), entry[2], entry[3].trim(), entry[4], entry[1]])
       .catch(async (err) => {
               console.error(err);
       });
@@ -15,7 +15,7 @@ async function handleFive(entry) {
   }
 }
 
-async function handleSeven(entry) {
+async function handleSeven(entry: Array<string>) {
   const addy = entry[1].split(',');
   if (addy.length === 2) {
     query<Contact>('INSERT INTO contacts (organization, city, statecode, contact, email, phone1, location) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id', [entry[0], addy[0], addy[1].trim(), entry[2], entry[3], entry[4], entry[1]])
@@ -27,7 +27,7 @@ async function handleSeven(entry) {
   }     
 }
 
-async function handleEleven(entry) {
+async function handleEleven(entry: Array<string>) {
   const parts = entry[1].split(',');
 
   if (parts.length > 1) {
@@ -47,7 +47,7 @@ async function handleEleven(entry) {
   }
 }
 
-async function handleTwelve(entry) {
+async function handleTwelve(entry: Array<string>) {
   query<Contact>('INSERT INTO contacts (organization, contact, address1, city, statecode, postcode, postcode4, phone1) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id', [entry[0], entry[1], entry[2], entry[3], entry[4], entry[5], entry[6], entry[7]])
     .catch(async (err) => {
       console.error(err);
@@ -55,7 +55,7 @@ async function handleTwelve(entry) {
   
 }
 
-async function handleThirtyThree(entry) {
+async function handleThirtyThree(entry: Array<string>) {
   const parts = entry[1].split(',');
   
   if (parts.length > 1) {
@@ -99,7 +99,6 @@ async function run() {
     .on('end', (rowCount: number) => console.log(`Parsed ${rowCount} rows`));
 
 
-  
 }
 
 (async () => {

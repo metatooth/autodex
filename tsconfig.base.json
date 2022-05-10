@@ -1,18 +1,14 @@
 {
   "compilerOptions": {
-    "target": "ES2019",
-    "sourceMap": true,
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "declaration": true,
-    "resolveJsonModule": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "importHelpers": true,
-    "skipLibCheck": true,
-    "lib": ["ES2019"],
+    "target": "esnext",
+    "useDefineForClassFields": true,
+    "module": "esnext",
     "moduleResolution": "node",
-    "incremental": true
+    "strict": true,
+    "jsx": "preserve",
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "lib": ["esnext", "dom"]
   }
 }

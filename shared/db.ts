@@ -1,4 +1,5 @@
-import { Pool, QueryResult } from 'pg';
+import pkg from 'pg';
+const { Pool } = pkg;
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -6,7 +7,7 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
-export async function query<T>(text, params): Promise<QueryResult<T>> {
+export async function query<T>(text: string, params: Array<string>): Promise<pkg.QueryResult<T>> {
   // const start = Date.now();
   const res = await pool.query<T>(text, params);
   // const duration = Date.now() - start;

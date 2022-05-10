@@ -3,6 +3,10 @@ export interface Contact {
   organization: string;
   location: string;
   contact: string;
+  city: string;
+  statecode: string;
+  postcode: string;
+  postcode4: string;
   email: string;
   phone1: string;
   phone2: string;
