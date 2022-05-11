@@ -22,7 +22,7 @@
     "lint": "npm-run-all lint:clean lint:etl lint:client lint:server",
     "lint:clean": "eslint clean --ext .ts",
     "lint:etl": "eslint etl --ext .ts",
-    "lint:client": "eslint client --ext .ts",
+    "lint:client": "eslint client --ext .ts,.vue",
     "lint:server": "eslint server --ext .ts",
     "serve": "concurrently --prefix \"[{name}]\" --names \"CLIENT,SERVER\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run serve:client\" \"npm run serve:server\"",
     "serve:client": "vite ./client",
