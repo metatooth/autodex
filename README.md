@@ -1,0 +1,2 @@
+# autodex
+An aUTOmated inDEX
