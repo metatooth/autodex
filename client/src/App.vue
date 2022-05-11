@@ -7,7 +7,7 @@
     data() {
       return {
         contacts: null,
-        columns: ["contact", "organization", "email", "phone1", "city", "statecode", "postcode", "postcode4"],
+        columns: ["contact", "organization", "email", "phone1", "address1", "city", "statecode", "postcode", "postcode4"],
         searchQuery: ""
       }
     },
