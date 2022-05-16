@@ -1,14 +1,18 @@
 <script lang="ts">
+import { PropType } from 'vue';
+import { Contact } from '../../../shared/types';
+
 export default {
   props: {
-    data: Array,
-    columns: Array,
-    filterKey: String,
+    data: { type: Array as PropType<Contact[]>, required: true },
+    columns: { type: Array as PropType<string[]>, required: true },
+    filterKey: { type: String, default: '' },
   },
   data() {
+    const obj: Record<string, any> = {};
     return {
       sortKey: this.columns[0],
-      sortOrders: this.columns.reduce((o, key) => ((o[key] = 1), o), {}),
+      sortOrders: this.columns.reduce((o, key) => ((o[key] = 1), o), obj),
     };
   },
   computed: {
@@ -18,10 +22,13 @@ export default {
       const order = this.sortOrders[sortKey] || 1;
       let data = this.data || [];
       if (filterKey) {
-        data = data.filter((row) => Object.keys(row).some((key) => String(row[key]).toLowerCase().indexOf(filterKey) > -1));
+        data = data.filter((row) => Object.keys(row)
+          .some((key) => key
+            .toLowerCase()
+            .indexOf(filterKey) > -1));
       }
       if (sortKey) {
-        data = data.slice().sort((a, b) => {
+        data = data.slice().sort((a: Record<string, any>, b: Record<string, any>) => {
           a = a[sortKey];
           b = b[sortKey];
           return (a === b ? 0 : a > b ? 1 : -1) * order;
@@ -31,11 +38,11 @@ export default {
     },
   },
   methods: {
-    sortBy(key) {
+    sortBy(key: string) {
       this.sortKey = key;
       this.sortOrders[key] = this.sortOrders[key] * -1;
     },
-    capitalize(str) {
+    capitalize(str: string) {
       return str.charAt(0).toUpperCase() + str.slice(1);
     },
   },

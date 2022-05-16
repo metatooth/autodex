@@ -1,6 +1,7 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
     "outDir": "../dist/shared",
     "composite": true

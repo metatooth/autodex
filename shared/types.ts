@@ -3,6 +3,7 @@ export interface Contact {
   organization: string;
   location: string;
   contact: string;
+  address1: string;
   city: string;
   statecode: string;
   postcode: string;
@@ -12,4 +13,6 @@ export interface Contact {
   phone2: string;
   createdat: Date;
   updatedat: Date;
+
+  [key: string]: any;
 }

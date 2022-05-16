@@ -7,7 +7,7 @@ const API_URL = 'http://localhost:8888';
 export default {
   data() {
     return {
-      contacts: null,
+      contacts: [],
       columns: ['contact', 'organization', 'email', 'phone1', 'address1', 'city', 'statecode', 'postcode', 'postcode4'],
       searchQuery: '',
     };
