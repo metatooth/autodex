@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { parse } from '@fast-csv/parse';
-import { Contact } from '../shared/types';
-import { query } from '../shared/db.js';
+import { Contact } from '../lib/types';
+import { query } from '../lib/db.js';
 
 async function handleFive(entry: Array<string>) {
   const addy = entry[1].split(',');
@@ -59,7 +59,7 @@ async function handleEleven(entry: Array<string>) {
         address = `${parts[0]} ${t.join(' ')}`;
       }
 
-      query<Contact>('INSERT INTO contacts (organization, contact, address1, city, statecode, postcode, postcode4, email, phone1, location) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id', [entry[0].trim(), entry[2].trim(), address.trim(), city.trim(), state.trim(), postcode.trim(), postcode4.trim(), entry[4].trim(), entry[5].trim(), entry[1]])
+      query<Contact>('INSERT INTO contacts (organization, contact, address1, city, statecode, postcode1, postcode2, email, phone1, location) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id', [entry[0].trim(), entry[2].trim(), address.trim(), city.trim(), state.trim(), postcode.trim(), postcode4.trim(), entry[4].trim(), entry[5].trim(), entry[1]])
         .catch(async (err) => {
           console.error(err);
         });
@@ -77,8 +77,8 @@ async function handleEleven(entry: Array<string>) {
 }
 
 async function handleTwelve(entry: Array<string>) {
-  query<Contact>('INSERT INTO contacts (organization, contact, address1, city, statecode, postcode, postcode4, phone1) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id', [entry[0].trim(), entry[1].trim(), entry[2].trim(), entry[3].trim(), entry[4].trim(), entry[5].trim(), entry[6].trim(), entry[7]])
-    .catch(async (err) => {
+  query<Contact>('INSERT INTO contacts (organization, contact, address1, city, statecode, postcode1, postcode2, phone1) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id', [entry[0].trim(), entry[1].trim(), entry[2].trim(), entry[3].trim(), entry[4].trim(), entry[5].trim(), entry[6].trim(), entry[7]])
+    .catch(async (err: string) => {
       console.error(err);
     });
 }
@@ -95,7 +95,7 @@ async function handleThirtyThree(entry: Array<string>) {
       const state = parts[1].trim();
 
       query<Contact>('INSERT INTO contacts (organization, contact, city, statecode, phone1, location) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id', [entry[0].trim(), entry[2].trim(), city.trim(), state.trim(), entry[3].trim(), entry[1]])
-        .catch(async (err) => {
+        .catch(async (err: string) => {
           console.error(err);
         });
     } else if (addy.length === 2) {
@@ -109,8 +109,8 @@ async function handleThirtyThree(entry: Array<string>) {
       addy.pop();
       const address = addy.join(' ');
 
-      query<Contact>('INSERT INTO contacts (organization, contact, address1, city, statecode, postcode, phone1, location) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id', [entry[0].trim(), entry[2].trim(), address.trim(), city.trim(), state.trim(), zip.trim(), entry[3].trim(), entry[1]])
-        .catch(async (err) => {
+      query<Contact>('INSERT INTO contacts (organization, contact, address1, city, statecode, postcode1, phone1, location) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id', [entry[0].trim(), entry[2].trim(), address.trim(), city.trim(), state.trim(), zip.trim(), entry[3].trim(), entry[1]])
+        .catch(async (err: string) => {
           console.error(err);
         });
     } else {
@@ -121,10 +121,10 @@ async function handleThirtyThree(entry: Array<string>) {
   }
 }
 
-async function run() {
-  console.log(process.argv[2]);
+export default async function etl(path: string) {
+  console.log(path);
 
-  fs.createReadStream(process.argv[2])
+  fs.createReadStream(path)
     .pipe(parse())
     .on('data', (row) => {
       if (row.length === 5) {
@@ -143,7 +143,3 @@ async function run() {
     })
     .on('end', (rowCount: number) => console.log(`Parsed ${rowCount} rows`));
 }
-
-(async () => {
-  run();
-})();

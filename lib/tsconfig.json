@@ -3,7 +3,7 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
-    "outDir": "../dist/shared",
+    "outDir": "../dist/lib",
     "composite": true
   },
   "include": ["./**/*.ts"],

@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Contact } from '../../shared/types';
 import ContactGrid from './components/ContactGrid.vue';
+import AutodexNavbar from './components/AutodexNavbar.vue';
 import appPackage from '../../package.json';
 
 const API_URL = 'http://localhost:8888';
@@ -9,12 +10,13 @@ export default {
   data() {
     return {
       contacts: [],
-      columns: ['organization', 'address1', 'city', 'statecode', 'postcode', 'phone1', 'contact', 'email'],
+      columns: ['organization', 'address1', 'city', 'statecode', 'postcode1', 'phone1', 'contact', 'email'],
       searchQuery: '',
     };
   },
 
   components: {
+    AutodexNavbar,
     ContactGrid,
   },
 
@@ -39,10 +41,12 @@ export default {
       fetch(url, options);
       
       const n = this.contacts.indexOf(entry);
-      console.log("found", n);
       if (n) {
         this.contacts.splice(n, 1);
       }
+    },
+    async updateQuery(query: string) {
+      this.searchQuery = query;
     }
   },
 };
@@ -50,23 +54,7 @@ export default {
 
 <template>
   <div class="container">
-    <nav class="navbar">
-      <div class="navbar-brand">
-        <a class="navbar-item has-text-primary">
-          <img src="/logo.png" width="25">&nbsp;Autodex
-        </a>
-      </div>
-      <div class="navbar-end">
-        <div class="navbar-item">
-          <p class="control has-icons-left">
-            <input class="input is-rounded" type="text" placeHolder="Search your contacts" v-model="searchQuery"/>
-            <span class="icon is-left has-text-primary">
-              <font-awesome-icon icon="search"/>
-            </span>
-          </p>
-        </div>
-      </div>
-    </nav>
+    <AutodexNavbar @query-updated="updateQuery" />
     <ContactGrid :data="contacts" :columns="columns" :filter-key="searchQuery" @trash-contact="trash" >
     </ContactGrid>
     <footer class="footer">

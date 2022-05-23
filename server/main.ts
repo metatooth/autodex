@@ -8,8 +8,8 @@ import http from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { query } from '../shared/db.js';
-import { Contact } from '../shared/types.js';
+import { query } from '../lib/db.js';
+import { Contact } from '../lib/types.js';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
