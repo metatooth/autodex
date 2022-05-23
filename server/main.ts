@@ -36,8 +36,14 @@ app.get('/', (req, res) => {
 });
 
 app.get('/contacts', async (req, res) => {
-  const { rows } = await query<Contact>('SELECT * FROM contacts', []);
+  const { rows } = await query<Contact>('SELECT * FROM contacts WHERE deleted <> true', []);
   res.status(200).json(rows);
+});
+
+app.delete('/contacts/:id', async (req, res) => {
+  const { id } = req.params;
+  await query("UPDATE contacts SET deleted = true, deletedat = CURRENT_TIMESTAMP WHERE id = $1", [id]);
+  res.status(204).json({});
 });
 
 process.env.TZ = 'ETC/Utc';

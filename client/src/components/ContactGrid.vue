@@ -22,10 +22,11 @@ export default {
       const order = this.sortOrders[sortKey] || 1;
       let data = this.data || [];
       if (filterKey) {
-        data = data.filter((row) => Object.keys(row)
-          .some((key) => key
-            .toLowerCase()
-            .indexOf(filterKey) > -1));
+        data = data.filter((row) => {
+          return Object.keys(row).some((key) => {
+            return String(row[key]).toLowerCase().indexOf(filterKey) > -1;
+          });
+        });
       }
       if (sortKey) {
         data = data.slice().sort((a: Record<string, any>, b: Record<string, any>) => {
@@ -38,19 +39,25 @@ export default {
     },
   },
   methods: {
+    capitalize(str: string) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    },
     sortBy(key: string) {
       this.sortKey = key;
       this.sortOrders[key] = this.sortOrders[key] * -1;
     },
-    capitalize(str: string) {
-      return str.charAt(0).toUpperCase() + str.slice(1);
-    },
+    trash(entry: Contact) {
+      const name = entry.organization || entry.contact || entry.id;
+      if (confirm(`OK to delete ${name}?`)) {
+        this.$emit("trash-contact", entry);
+      }
+    }
   },
 };
 </script>
 
 <template>
-  <table class="table" v-if="filtered.length">
+  <table class="table is-striped" v-if="filtered.length">
     <thead>
       <tr>
         <th v-for="key in columns"
@@ -61,12 +68,20 @@ export default {
           <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'">
           </span>
         </th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
       <tr v-for="entry in filtered" :key="entry.id">
         <td v-for="key in columns" :key="key">
           {{ entry[key] }}
+        </td>
+        <td>
+          <button class="button" @click="trash(entry)" >
+            <span class="icon">
+              <font-awesome-icon icon="trash" />
+            </span>
+          </button>
         </td>
       </tr>
     </tbody>
@@ -75,38 +90,4 @@ export default {
 </template>
 
 <style>
-table {
-  border: 3px solid #00bbee;
-  border-radius: 5px;
-}
-
-th {
-  background-color: #00bbee;
-  color: rgba(255, 255, 255, 0.88);
-  cursor: pointer;
-  user-select: none;
-  font-family: Sans-Serif;
-  border-radius: 5px;
-}
-
-.arrow {
-  display: inline-block;
-  vertical-align: middle;
-  width: 0;
-  height: 0;
-  margin-left: 5px;
-  opacity: 0.66;
-}
-
-.arrow.asc {
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-bottom: 4px solid #fff;
-}
-
-.arrow.dsc {
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 4px solid #fff;
-}
 </style>

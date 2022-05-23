@@ -1,4 +1,5 @@
 <script lang="ts">
+import { Contact } from '../../shared/types';
 import ContactGrid from './components/ContactGrid.vue';
 import appPackage from '../../package.json';
 
@@ -8,7 +9,7 @@ export default {
   data() {
     return {
       contacts: [],
-      columns: ['contact', 'organization', 'email', 'phone1', 'address1', 'city', 'statecode', 'postcode', 'postcode4'],
+      columns: ['organization', 'address1', 'city', 'statecode', 'postcode', 'phone1', 'contact', 'email'],
       searchQuery: '',
     };
   },
@@ -32,51 +33,49 @@ export default {
       const url = `${API_URL}/contacts`;
       this.contacts = await (await fetch(url)).json();
     },
+    async trash(entry: Contact) {
+      const url = `${API_URL}/contacts/${entry.id}`;
+      const options = { method: "DELETE" };
+      fetch(url, options);
+      
+      const n = this.contacts.indexOf(entry);
+      console.log("found", n);
+      if (n) {
+        this.contacts.splice(n, 1);
+      }
+    }
   },
 };
 </script>
 
 <template>
-  <section>
-    <header>
-      <h1><img src="/logo.png" width="25">&nbsp;Autodex</h1>
-    </header>
-    <main>
-      <section class="section">
-        <form id="search">
-          <div class="field">
-            <div class="control">
-              <input
-                class="input"
-                type="text"
-                name="query"
-                placeholder="Search..."
-                v-model="searchQuery">
-            </div>
-          </div>
-        </form>
-      </section>
-      <ContactGrid :data="contacts" :columns="columns" :filter-key="searchQuery">
-      </ContactGrid>
-    </main>
-    <footer>
+  <div class="container">
+    <nav class="navbar">
+      <div class="navbar-brand">
+        <a class="navbar-item has-text-primary">
+          <img src="/logo.png" width="25">&nbsp;Autodex
+        </a>
+      </div>
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <p class="control has-icons-left">
+            <input class="input is-rounded" type="text" placeHolder="Search your contacts" v-model="searchQuery"/>
+            <span class="icon is-left has-text-primary">
+              <font-awesome-icon icon="search"/>
+            </span>
+          </p>
+        </div>
+      </div>
+    </nav>
+    <ContactGrid :data="contacts" :columns="columns" :filter-key="searchQuery" @trash-contact="trash" >
+    </ContactGrid>
+    <footer class="footer">
       <hr>
       {{ appVersion }} &copy; 2022 <a href="https://metatooth.com">Metatooth LLC</a>
     </footer>
-  </section>
+  </div>
 </template>
 
-<style>
-h1 {
-    color: #00bbee;
-}
-
-.section {
-  margin-bottom: 10px;
-}
-
-footer {
-  text-align: center;
-  font-size: small;
-}
+<style lang="scss">
+@import "../assets/main.scss";
 </style>

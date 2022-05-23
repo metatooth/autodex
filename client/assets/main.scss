@@ -1,3 +1,9 @@
-$blue: #00bbee;
+@charset "utf-8";
 
-@import "~bulma";
+$cyan: #00BBEE;
+
+$primary: $cyan;
+
+@import "bulma/css/bulma.css";
+   
+
