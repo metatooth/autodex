@@ -1,2 +1,2 @@
 # autodex
-An aUTOmated inDEX
+automated index
