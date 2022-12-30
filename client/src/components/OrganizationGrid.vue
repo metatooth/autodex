@@ -1,11 +1,10 @@
 <script lang="ts">
 import { PropType } from 'vue';
-import ContactRow from './ContactRow.vue';
-import { Contact } from '../../../lib/types';
+import { Organization } from '../../../lib/types';
 
 export default {
   props: {
-    data: { type: Array as PropType<Contact[]>, required: true },
+    data: { type: Array as PropType<Organization[]>, required: true },
     columns: { type: Array as PropType<string[]>, required: true },
     filterKey: { type: String, default: '' },
   },
@@ -15,9 +14,6 @@ export default {
       sortKey: this.columns[0],
       sortOrders: this.columns.reduce((o, key) => ((o[key] = 1), o), obj),
     };
-  },
-  components: {
-    ContactRow
   },
   computed: {
     filtered() {
@@ -50,16 +46,20 @@ export default {
       this.sortKey = key;
       this.sortOrders[key] = this.sortOrders[key] * -1;
     },
+    trash(entry: Organization) {
+      const name = entry.organization || entry.id;
+      if (confirm(`OK to delete ${name}?`)) {
+        this.$emit("trash-contact", entry);
+      }
+    }
   },
 };
 </script>
 
 <template>
-  <div  class="table-container" v-if="filtered.length">
-  <table class="table is-bordered is-striped is-fullwidth">
+  <table class="table is-striped" v-if="filtered.length">
     <thead>
       <tr>
-        <th>&nbsp;</th>
         <th v-for="key in columns"
             :key="key"
             @click="sortBy(key)"
@@ -68,26 +68,26 @@ export default {
           <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'">
           </span>
         </th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
-      <contact-row
-        v-for="entry in filtered"
-        :key="entry.id"
-        :entry="entry"
-        :columns="columns" />
+      <tr v-for="entry in filtered" :key="entry.id">
+        <td v-for="key in columns" :key="key">
+          {{ entry[key] }}
+        </td>
+        <td>
+          <button class="button" @click="trash(entry)" >
+            <span class="icon">
+              <font-awesome-icon icon="trash" />
+            </span>
+          </button>
+        </td>
+      </tr>
     </tbody>
   </table>
-  </div>
   <p v-else>No matches found.</p>
 </template>
 
-<style scoped>
-  table thead th {
-    position: sticky;
-    top: 0;
-    width: 60px;
-    font-size: 14px;
-    vertical-align: middle;
-  }
+<style>
 </style>

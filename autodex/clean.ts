@@ -2,50 +2,50 @@ import { Contact } from '../lib/types';
 import { query } from '../lib/db.js';
 
 async function dots() {
-  const { rows } = await query<Contact>("SELECT * FROM contacts WHERE phone1 LIKE '%.%.%'", []);
+  const { rows } = await query<Contact>("SELECT * FROM contacts WHERE phone LIKE '%.%.%'", []);
 
   rows.forEach((row: Contact) => {
-    const phone = row.phone1.replace(/\./g, '-');
+    const phone = row.phone.replace(/\./g, '-');
     query<Contact>(
-      'UPDATE contacts SET phone1 = $1 WHERE id = $2',
+      'UPDATE contacts SET phone = $1 WHERE id = $2',
       [phone, `${row.id}`],
     );
   });
 }
 
 async function parens() {
-  const { rows } = await query<Contact>("SELECT * FROM contacts WHERE phone1 LIKE '%) %'", []);
+  const { rows } = await query<Contact>("SELECT * FROM contacts WHERE phone LIKE '%) %'", []);
 
   rows.forEach((row: Contact) => {
-    const phone = row.phone1.replace(/\(/g, '').replace(/\) /g, '-');
+    const phone = row.phone.replace(/\(/g, '').replace(/\) /g, '-');
     query<Contact>(
-      'UPDATE contacts SET phone1 = $1 WHERE id = $2',
+      'UPDATE contacts SET phone = $1 WHERE id = $2',
       [phone, `${row.id}`],
     );
   });
 }
 
-async function phone1() {
-  const { rows } = await query<Contact>("SELECT * FROM contacts WHERE phone1 LIKE 'Phone:%'", []);
+async function phones() {
+  const { rows } = await query<Contact>("SELECT * FROM contacts WHERE phone LIKE 'Phone:%'", []);
 
   rows.forEach((row: Contact) => {
-    const phone = row.phone1.split(' ');
+    const phone = row.phone.split(' ');
     query<Contact>(
-      'UPDATE contacts SET phone1 = $1 WHERE id = $2',
+      'UPDATE contacts SET phone = $1 WHERE id = $2',
       [phone[1], `${row.id}`],
     );
   });
 
-  query<Contact>("UPDATE contacts SET phone1 = '' WHERE phone1 = 'No Phone Available'", []);
+  query<Contact>("UPDATE contacts SET phone = '' WHERE phone = 'No Phone Available'", []);
 }
 
 async function postcodes() {
-  const { rows } = await query<Contact>('SELECT * FROM contacts WHERE postcode1 is not null', []);
+  const { rows } = await query<Contact>('SELECT * FROM addresses WHERE postcode1 is not null', []);
 
   rows.forEach((row: Contact) => {
     if (parseInt(row.postcode1, 10) < 10000) {
       query<Contact>(
-        'UPDATE contacts SET postcode1 = $1 WHERE id = $2',
+        'UPDATE addresses SET postcode1 = $1 WHERE id = $2',
         [`0${parseInt(row.postcode1, 10)}`, `${row.id}`],
       );
     }
@@ -53,17 +53,17 @@ async function postcodes() {
 }
 
 async function postcode4s() {
-  const { rows } = await query<Contact>('SELECT * FROM contacts WHERE postcode2 is not null', []);
+  const { rows } = await query<Contact>('SELECT * FROM addresses WHERE postcode2 is not null', []);
 
   rows.forEach((row: Contact) => {
     if (parseInt(row.postcode2, 10) < 100) {
       query<Contact>(
-        'UPDATE contacts SET postcode2 = $1 WHERE id = $2',
+        'UPDATE addresses SET postcode2 = $1 WHERE id = $2',
         [`00${parseInt(row.postcode2, 10)}`, `${row.id}`],
       );
     } else if (parseInt(row.postcode2, 10) < 1000) {
       query<Contact>(
-        'UPDATE contacts SET postcode2 = $1 WHERE id = $2',
+        'UPDATE addresses SET postcode2 = $1 WHERE id = $2',
         [`0${parseInt(row.postcode2, 10)}`, `${row.id}`],
       );
     }
@@ -71,12 +71,12 @@ async function postcode4s() {
 }
 
 async function slash() {
-  const { rows } = await query<Contact>("SELECT * FROM contacts WHERE phone1 LIKE '%/%-%'", []);
+  const { rows } = await query<Contact>("SELECT * FROM contacts WHERE phone LIKE '%/%-%'", []);
 
   rows.forEach((row) => {
-    const phone = row.phone1.replace(/\//g, '-');
+    const phone = row.phone.replace(/\//g, '-');
     query<Contact>(
-      'UPDATE contacts SET phone1 = $1 WHERE id = $2',
+      'UPDATE contacts SET phone = $1 WHERE id = $2',
       [phone, `${row.id}`],
     );
   });
@@ -85,7 +85,7 @@ async function slash() {
 export default async function clean() {
   dots();
   parens();
-  phone1();
+  phones();
   postcodes();
   postcode4s();
   slash();

@@ -9,14 +9,13 @@
     "build:server": "tsc -b ./server",
     "copy": "npm run-all copy:client copy:server",
     "copy:client": "npm-run-all copy:client:favicon copy:client:views",
-    "copy:client:favicon": "cp ./shared/assets/favicon.ico ./dist/client/favicon.ico",
+    "copy:client:favicon": "cp ./lib/assets/favicon.ico ./dist/client/favicon.ico",
     "copy:client:views": "cp -r ./client/views ./dist/client/views",
-    "copy:server": "cp ./shared/assets/favicon.ico ./dist/server/favicon.ico",
+    "copy:server": "cp ./lib/assets/favicon.ico ./dist/server/favicon.ico",
     "clean": "rm -rf ./dist",
     "build-client": "npm-run-all clean:client build:client copy:client",
     "build-server": "npm-run-all clean:server build:server copy:server",
     "build:client": "vue-tsc --project ./client --noEmit && vite build ./client",
-    "watch:client": "nodemon --watch server -e ts,vue --exec vue-tsc --project ./client --noEmit",
     "clean:client": "rm -rf ./dist/client",
     "clean:server": "rm -rf ./dist/server",
     "lint": "npm-run-all lint:clean lint:etl lint:client lint:server",
@@ -52,7 +51,8 @@
     "serve-favicon": "^2.5.0",
     "vite": "^2.9.8",
     "vite-plugin-singlefile": "^0.9.0",
-    "vue": "^3.2.33"
+    "vue": "^3.2.33",
+    "vue-router": "^4.0.13"
   },
   "devDependencies": {
     "@babel/types": "^7.17.10",

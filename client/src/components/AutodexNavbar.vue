@@ -1,23 +1,28 @@
 <script lang="ts">
-import { watch, ref } from "vue";
-
 export default {
-  props: {},
-  emits: ["query-updated"],
-  setup(props, context) {
-    const query = ref("");
-
-    watch(query, (newVal) => {
-      context.emit("query-updated", newVal);
-    })
-
-    return { query };
+  emits: ["query-updated", "download"],
+  data() {
+    return {
+      query: ""
+    };
+  },
+  watch: {
+    query(newQuery, oldQuery) {
+      this.$emit("query-updated", newQuery);
+    }
+  },
+  methods: {
+    add() {
+    },
+    download() {
+      this.$emit("download");
+    }
   }
 }
 </script>
 
 <template>
-  <nav class="navbar">
+  <nav class="navbar is-fixed-top">
     <div class="navbar-brand">
       <a class="navbar-item has-text-primary">
         <img src="/logo.png" width="25">&nbsp;Autodex

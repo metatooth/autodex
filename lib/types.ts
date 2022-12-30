@@ -1,18 +1,42 @@
 export interface Contact {
   id: number;
-  organization: string;
-  location: string;
+  germ: string;
   contact: string;
-  address1: string;
-  city: string;
-  statecode: string;
-  postcode: string;
-  postcode4: string;
   email: string;
-  phone1: string;
-  phone2: string;
+  phone: string;
   createdat: Date;
   updatedat: Date;
+  deleted: Boolean;
+  deletedat: Date;
+  [key: string]: any;
+}
 
+export interface Address {
+  id: number;
+  germ: string;
+  address1: string;
+  address2: string;
+  city: string;
+  statecode: string;
+  postcode1: string;
+  postcode2: string;
+  countrycode: string;
+  createdat: Date;
+  updatedat: Date;
+  deleted: Boolean;
+  deletedat: Date;
+  [key: string]: any;
+}
+
+export interface Organization {
+  id: number;
+  germ: string;
+  organization: string;
+  address: Address;
+  contact: Contact;
+  createdat: Date;
+  updatedat: Date;
+  deleted: Boolean;
+  deletedat: Date;
   [key: string]: any;
 }

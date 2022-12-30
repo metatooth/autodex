@@ -9,7 +9,8 @@ RUN npm install --unsafe-perms
 FROM base as server
 
 COPY server ./server
-COPY shared ./shared
+COPY lib ./lib
+
 COPY tsconfig.base.json ./
 
 RUN npm run build:server
@@ -19,7 +20,7 @@ CMD [ "npm", "run", "serve:server" ]
 FROM base as client
 
 COPY client ./client
-COPY shared ./shared
+COPY lib ./lib
 COPY tsconfig.base.json ./
 
 RUN npm run build:client

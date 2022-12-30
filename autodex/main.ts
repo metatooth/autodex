@@ -8,10 +8,10 @@ async function run() {
       if (process.argv.length !== 4) {
         console.error("Need to provide path to CSV input.");
       } else {
-        etl(process.argv[3]);
+        await etl(process.argv[3]);
       }
     } else if (command.toLowerCase() === "clean") {
-      clean();
+      await clean();
     }
   }
 }

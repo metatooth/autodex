@@ -1,33 +1,69 @@
 import fs from 'fs';
 import { parse } from '@fast-csv/parse';
-import { Contact } from '../lib/types';
-import { query } from '../lib/db.js';
+import { Contact, Address, Organization } from '../lib/types';
+import { findOrCreateContact,
+         findOrCreateAddress,
+         findOrCreateOrganization,
+         addContactToOrganization } from '../lib/db.js';
 
-async function handleFive(entry: Array<string>) {
+async function handler(
+  contact: string,
+  phone: string,
+  email: string,
+  address1: string,
+  city: string,
+  statecode: string,
+  postcode1: string,
+  postcode2: string,
+  organization: string,
+  germ: string): Promise<void> {
+    return await findOrCreateContact(contact, phone, email, germ)
+      .then(async (cid) => {
+        return await findOrCreateAddress(
+          address1, city, statecode, postcode1, postcode2, germ)
+          .then(async (aid) => {
+            return await findOrCreateOrganization(organization, aid, germ)
+              .then(async (oid) => {
+                return await addContactToOrganization(oid, cid)
+                  .then(async () => {
+                    return;
+                  });
+              });
+          });
+      });
+  }
+
+async function handleFive(entry: Array<string>): Promise<void> {
+  let org = 0;
   const addy = entry[1].split(',');
   if (addy.length === 2) {
-    query<Contact>('INSERT INTO contacts (organization, city, statecode, contact, email, phone1, location) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id', [entry[0].trim(), addy[0].trim(), addy[1].trim(), entry[2].trim(), entry[3].trim(), entry[4].trim(), entry[1]])
-      .catch(async (err) => {
-        console.error(err);
-      });
+    return await handler(
+      entry[2].trim(), entry[3].trim(), entry[4].trim(),
+      "", addy[0].trim(), addy[1].trim(), "", "",
+      entry[0].trim(),
+      entry.join(","));
   } else {
-    console.log('unhandled', entry);
+    console.log('unhandled 5', entry);
   }
+
+  return;
 }
 
-async function handleSeven(entry: Array<string>) {
+async function handleSeven(entry: Array<string>): Promise<void> {
   const addy = entry[1].split(',');
   if (addy.length === 2) {
-    query<Contact>('INSERT INTO contacts (organization, city, statecode, contact, email, phone1, location) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id', [entry[0].trim(), addy[0].trim(), addy[1].trim(), entry[2].trim(), entry[3].trim(), entry[4].trim(), entry[1]])
-      .catch(async (err) => {
-        console.error(err);
-      });
-  } else {
-    console.log('unhandled', entry);
+    return await handler(
+      entry[2].trim(), entry[3].trim(), entry[4].trim(),
+      "", addy[0].trim(), addy[1].trim(), "", "",
+      entry[0].trim(),
+      entry.join(","));
   }
+  
+  console.log('unhandled 7', entry);
+  return;
 }
 
-async function handleEleven(entry: Array<string>) {
+async function handleEleven(entry: Array<string>): Promise<void> {
   const parts = entry[1].split(',');
   const num = parts.length;
 
@@ -59,31 +95,40 @@ async function handleEleven(entry: Array<string>) {
         address = `${parts[0]} ${t.join(' ')}`;
       }
 
-      query<Contact>('INSERT INTO contacts (organization, contact, address1, city, statecode, postcode1, postcode2, email, phone1, location) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id', [entry[0].trim(), entry[2].trim(), address.trim(), city.trim(), state.trim(), postcode.trim(), postcode4.trim(), entry[4].trim(), entry[5].trim(), entry[1]])
-        .catch(async (err) => {
-          console.error(err);
-        });
+      return await handler(
+        entry[2].trim(), entry[4].trim(), entry[5].trim(),
+        address.trim(), city.trim(), state.trim(), postcode.trim(), postcode4.trim(),
+        entry[0].trim(),
+        entry.join(","));
+      
     } else if (parts.length === 2) {
-      query<Contact>('INSERT INTO contacts (organization, contact, city, statecode, email, phone1, location) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id', [entry[0].trim(), entry[2].trim(), parts[0].trim(), parts[1].trim(), entry[4].trim(), entry[5].trim(), entry[1]])
-        .catch(async (err) => {
-          console.error(err);
-        });
+
+      
+      return await handler(
+        entry[2].trim(), entry[4].trim(), entry[5].trim(),
+        "", parts[0].trim(), parts[1].trim(), "", "",
+        entry[0].trim(),
+        entry.join(","));
+
     } else {
-      console.log('unhandled statezip', entry);
+      console.log('unhandled 11 statezip', entry);
     }
   } else {
-    console.log('unhandled parts', entry);
+    console.log('unhandled 11 parts', entry);
   }
+
+  return;
 }
 
-async function handleTwelve(entry: Array<string>) {
-  query<Contact>('INSERT INTO contacts (organization, contact, address1, city, statecode, postcode1, postcode2, phone1) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id', [entry[0].trim(), entry[1].trim(), entry[2].trim(), entry[3].trim(), entry[4].trim(), entry[5].trim(), entry[6].trim(), entry[7]])
-    .catch(async (err: string) => {
-      console.error(err);
-    });
+async function handleTwelve(entry: Array<string>): Promise<void> {
+  return await handler(
+    entry[1].trim(), "", entry[7],
+    entry[2].trim(), entry[3].trim(), entry[4].trim(), entry[5].trim(), entry[6].trim(),
+    entry[0].trim(),
+    entry.join(","));
 }
 
-async function handleThirtyThree(entry: Array<string>) {
+async function handleThirtyThree(entry: Array<string>): Promise<void> {
   const parts = entry[1].split(',');
   const num = parts.length;
 
@@ -94,10 +139,12 @@ async function handleThirtyThree(entry: Array<string>) {
       const city = parts[0].trim();
       const state = parts[1].trim();
 
-      query<Contact>('INSERT INTO contacts (organization, contact, city, statecode, phone1, location) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id', [entry[0].trim(), entry[2].trim(), city.trim(), state.trim(), entry[3].trim(), entry[1]])
-        .catch(async (err: string) => {
-          console.error(err);
-        });
+      return await handler(
+        entry[2].trim(), "", entry[3].trim(),      
+        "", city.trim(), state.trim(), "", "",
+        entry[0].trim(),
+        entry.join(","));
+
     } else if (addy.length === 2) {
       const state = addy[0];
       const zip = addy[1];
@@ -109,37 +156,50 @@ async function handleThirtyThree(entry: Array<string>) {
       addy.pop();
       const address = addy.join(' ');
 
-      query<Contact>('INSERT INTO contacts (organization, contact, address1, city, statecode, postcode1, phone1, location) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id', [entry[0].trim(), entry[2].trim(), address.trim(), city.trim(), state.trim(), zip.trim(), entry[3].trim(), entry[1]])
-        .catch(async (err: string) => {
-          console.error(err);
-        });
+      return await handler(
+        entry[2].trim(), "", entry[3].trim(),
+        address.trim(), city.trim(), state.trim(), zip.trim(), "",
+        entry[0].trim(),
+        entry.join(","));
+
     } else {
-      console.log('unhandled state zip', entry);
+      console.log('unhandled 33 state zip', entry);
     }
   } else {
-    console.log('unhandled', entry);
+    console.log('unhandled 33', entry);
   }
+
+  return;
 }
 
 export default async function etl(path: string) {
   console.log(path);
 
-  fs.createReadStream(path)
+  const rows: Array<Array<string>> = [];
+  
+  await fs.createReadStream(path)
     .pipe(parse())
-    .on('data', (row) => {
-      if (row.length === 5) {
-        handleFive(row);
-      } else if (row.length === 7) {
-        handleSeven(row);
-      } else if (row.length === 11) {
-        handleEleven(row);
-      } else if (row.length === 12) {
-        handleTwelve(row);
-      } else if (row.length === 33) {
-        handleThirtyThree(row);
-      } else {
-        console.log('unhandled', row.length, row);
-      }
+    .on('data', async (row) => {
+      rows.push(row);
     })
-    .on('end', (rowCount: number) => console.log(`Parsed ${rowCount} rows`));
+    .on('end', async (rowCount: number) => {
+      console.log(`Parsed ${rowCount} rows`);
+      for (const row in rows) {
+        if (rows[row].length === 5) {
+          await handleFive(rows[row]);
+        } else if (rows[row].length === 7) {
+          await handleSeven(rows[row]);
+        } else if (rows[row].length === 11) {
+          await handleEleven(rows[row]);
+        } else if (rows[row].length === 12) {
+          await handleTwelve(rows[row]);
+        } else if (rows[row].length === 33) {
+          await handleThirtyThree(rows[row]);
+        } else {
+          console.log('unhandled', rows[row].length, rows[row]);
+        }
+      }
+      
+    });
+  
 }
